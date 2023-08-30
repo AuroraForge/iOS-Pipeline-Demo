@@ -33,7 +33,9 @@ jobs:
           output-formatter: xcbeautify
           enable-code-coverage: true
           action: clean test
-      - shell: zsh
+      - shell: bash
+        name: Convert test results
+        if: always()
         run: |
           mkdir test_results
           xsltproc -o test_results/report.junit \
