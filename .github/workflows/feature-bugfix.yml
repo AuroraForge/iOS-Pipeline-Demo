@@ -38,15 +38,14 @@ jobs:
         if: always()
         run: |
           mkdir test_results
-          xsltproc -o test_results/report.junit \
-          .github/plist_to_junit.xsl \
-          .derived_data/Logs/*_TestSummaries.plist
+          xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > test_results/report.junit
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
-        if: always()
+        uses: dorny/test-reporter@v1
+        if: success() || failure()    # run this step even if previous step failed
         with:
-          files: |
-            test_results/report.junit
+          name: Unit Tests            
+          path: test_results/report.junit
+          reporter: java-junit 
 
   #build-archive:
   #  name: Archive
