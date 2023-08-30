@@ -22,8 +22,11 @@ jobs:
     runs-on: self-hosted
     permissions: write-all
     steps:
+      # Get the sources
       - name: Checkout
         uses: actions/checkout@v1
+
+      # Run the unit tests
       - name: xcodebuild Test
         uses: sersoft-gmbh/xcodebuild-action@v2.1
         with:
@@ -34,32 +37,39 @@ jobs:
           output-formatter: xcbeautify
           enable-code-coverage: true
           action: clean test
+
+      # Convert the xctestresult bundle to a junit report
       - shell: bash
         name: Convert test results
-        if: always()
+        if: success() || failure()
         run: |
           mkdir test_results
           xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > test_results/report.junit
+
+      # Publish the junit report
       - name: Publish Test Results
         uses: dorny/test-reporter@v1
-        if: success() || failure()    # run this step even if previous step failed
+        if: success() || failure()
         with:
           name: Unit Test Report            
           path: test_results/report.junit
           reporter: java-junit 
 
-  #build-archive:
-  #  name: Archive
-  #  needs: test-unit
-  #  runs-on: self-hosted
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v1
-  #    - name: xcodebuild Archive
-  #      uses: sersoft-gmbh/xcodebuild-action@v2.1
-  #      with:
-  #        project: GithubActionDemo.xcodeproj
-  #        scheme: GithubActionDemo
-  #        sdk: iphoneos
-  #        output-formatter: xcbeautify
-  #        action: clean archive
+  build-archive:
+    name: Archive
+    needs: test-unit
+    runs-on: self-hosted
+    steps:
+      # Get the sources
+      - name: Checkout
+        uses: actions/checkout@v1
+      
+      # Build and archive
+      - name: xcodebuild Archive
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          project: GithubActionDemo.xcodeproj
+          scheme: GithubActionDemo
+          sdk: iphoneos
+          output-formatter: xcbeautify
+          action: clean archive
