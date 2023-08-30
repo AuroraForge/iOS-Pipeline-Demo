@@ -1,0 +1,18 @@
+//
+//  Debug.xcconfig
+//  GithubActionDemo
+//
+//  Created by Holloh, Niklas on 30.08.23.
+//
+
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+
+// These are values for debug, local developer machine builds only.
+// For release builds, all parameters are injected from the CI.
+
+DEMO_VERSION=0.1.0
+DEMO_BUILD_NUMBER=0
+DEMO_BUNDLE_ID=de.adesso-mobile.research.ghademo.debug
+DEMO_BACKEND_ENVIRONMENT=dev
+DEMO_APP_ICON=AppIconDebug
