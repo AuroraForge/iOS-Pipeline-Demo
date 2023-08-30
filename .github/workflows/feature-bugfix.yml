@@ -40,7 +40,7 @@ jobs:
           mkdir test_results
           xsltproc -o test_results/report.junit \
           .github/plist_to_junit.xsl \
-          .derived_data/Logs/Test/*_TestSummaries.plist
+          .derived_data/Logs/*_TestSummaries.plist
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: always()
