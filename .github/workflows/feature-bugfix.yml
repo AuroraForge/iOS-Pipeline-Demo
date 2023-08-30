@@ -31,7 +31,7 @@ jobs:
           destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
           output-formatter: xcbeautify
           enable-code-coverage: true
-          action: clean test
+          action: --no-codesign clean test
 
   build-archive:
     name: Archive
