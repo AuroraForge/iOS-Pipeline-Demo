@@ -28,23 +28,36 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           scheme: GithubActionDemo
+          derived-data-path: .derived_data
           destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
           output-formatter: xcbeautify
           enable-code-coverage: true
           action: clean test
-
-  build-archive:
-    name: Archive
-    needs: test-unit
-    runs-on: self-hosted
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: xcodebuild Archive
-        uses: sersoft-gmbh/xcodebuild-action@v2.1
+      - shell: zsh
+        run: |
+          mkdir test_results
+          xsltproc -o test_results/report.junit \
+          .github/plist_to_junit.xsl \
+          .derived_data/Logs/Test/*_TestSummaries.plist
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: always()
         with:
-          project: GithubActionDemo.xcodeproj
-          scheme: GithubActionDemo
-          sdk: iphoneos
-          output-formatter: xcbeautify
-          action: clean archive
+          files: |
+            test_results/report.junit
+
+  #build-archive:
+  #  name: Archive
+  #  needs: test-unit
+  #  runs-on: self-hosted
+  #  steps:
+  #    - name: Checkout
+  #      uses: actions/checkout@v1
+  #    - name: xcodebuild Archive
+  #      uses: sersoft-gmbh/xcodebuild-action@v2.1
+  #      with:
+  #        project: GithubActionDemo.xcodeproj
+  #        scheme: GithubActionDemo
+  #        sdk: iphoneos
+  #        output-formatter: xcbeautify
+  #        action: clean archive
