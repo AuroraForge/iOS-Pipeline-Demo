@@ -28,7 +28,7 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           scheme: GithubActionDemo
-          destination: platform=iOS Simulator
+          destination: platform=iOS Simulator, OS:16.4, name:iPhone 14 Pro
           output-formatter: xcbeautify
           action: clean test
 
