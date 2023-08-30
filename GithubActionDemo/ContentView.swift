@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ContentView: View {
     
+    @State private var pickedEnvironment: String = "dev"
+    
     var environment: String? {
         Bundle.main.infoDictionary?["BACKEND_ENVIRONMENT"] as? String
     }
@@ -38,6 +40,12 @@ struct ContentView: View {
             Text("Environment: " + (environment ?? "nil"))
             Text("Version: " + (version ?? "nil"))
             Text("Bundle ID:\n" + (bundleId ?? "nil"))
+            
+            Picker("Environment", selection: $pickedEnvironment) {
+                Text("DEV").tag("dev")
+                Text("STAGING").tag("staging")
+                Text("PROD").tag("prod")
+            }
         }
         .padding()
     }
