@@ -122,7 +122,7 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           output-formatter: xcbeautify
-          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} exportArchive
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive
 
       # Upload artifact
       - name: Upload artifacts
