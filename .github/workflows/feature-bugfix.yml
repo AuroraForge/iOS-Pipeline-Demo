@@ -1,4 +1,4 @@
-name: "Feature/Bugfix ${{ github.run_id }}"
+name: "Feature/Bugfix"
 on: 
   workflow_dispatch:
   pull_request:
@@ -74,7 +74,7 @@ jobs:
   #        reporter: java-junit 
 
   build-archive:
-    name: Archive
+    name: Archive (${{ github.run_id }})
     #needs: test-unit
     runs-on: self-hosted
     steps:
