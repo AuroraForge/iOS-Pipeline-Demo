@@ -121,6 +121,7 @@ jobs:
       - name: Export IPA
         uses: sersoft-gmbh/xcodebuild-action@v2.1
         with:
+          project: GithubActionDemo.xcodeproj
           output-formatter: xcbeautify
           action: exportArchive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }}
 
