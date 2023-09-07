@@ -123,7 +123,7 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           output-formatter: xcbeautify
-          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_OUTPUT_DIRECTORY }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive
 
       # Upload artifact
       - name: Upload artifacts
@@ -157,5 +157,5 @@ jobs:
           appName: ${{ env.DEPLOY_APPCENTER_APP_NAME }}
           token: ${{ secrets.APP_CENTER_TOKEN }}
           group: ${{ env.DEPLOY_APPCENTER_DISTRIBUTION_GROUPS }}
-          file: ${{ env.BUILD_IPA_PATH }}
+          file: ${{ env.BUILD_OUTPUT_DIRECTORY }}/GithubActionDemo.ipa
     
