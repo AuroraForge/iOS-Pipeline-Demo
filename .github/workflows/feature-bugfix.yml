@@ -110,7 +110,7 @@ jobs:
           scheme: GithubActionDemo
           sdk: iphoneos
           output-formatter: xcbeautify
-          action: clean archive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }}
+          action: clean archive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -showBuildSettings
 
       # Export ipa
       - name: Export IPA
