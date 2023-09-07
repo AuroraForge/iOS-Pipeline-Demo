@@ -1,4 +1,4 @@
-name: "Feature/Bugfix"
+name: "Feature/Bugfix ${{ github.run_id }}"
 on: 
   workflow_dispatch:
   pull_request:
