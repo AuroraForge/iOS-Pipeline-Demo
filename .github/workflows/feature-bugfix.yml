@@ -112,9 +112,10 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           scheme: GithubActionDemo
+          destination: generic/platform=iOS
           sdk: iphoneos
           output-formatter: xcbeautify
-          action:  -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -showBuildSettings clean archive
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -showBuildSettings clean archive
 
       # Export ipa
       - name: Export IPA
