@@ -144,7 +144,7 @@ jobs:
   deploy-to-appcenter:
     name: Deploy To AppCenter
     needs: build-archive
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Download artficats
         uses: actions/download-artifact@v3
