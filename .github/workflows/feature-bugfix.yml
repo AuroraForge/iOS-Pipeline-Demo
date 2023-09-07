@@ -11,6 +11,16 @@ env:
   DEMO_BUNDLE_ID: 'de.adesso-mobile.research.ghademo.branch'
   DEMO_BACKEND_ENVIRONMENT: 'dev'
   DEMO_APP_ICON: 'AppIcon'
+  BUILD_OUTPUT_DIRECTORY: .build
+  BUILD_CODESIGN_DIRECTORY: .codesign
+  BUILD_KEYCHAIN_PATH: ${{ env.BUILD_CODESIGN_DIRECTORY }}/certificates.keychain
+  BUILD_VARIANT: Branch
+  BUILD_NAME: GithubActionDemo${{ env.BUILD_VARIANT }}
+  BUILD_XCARCHIVE_PATH: ${{ env.BUILD_OUTPUT_DIRECTORY }}/${{ env.BUILD_NAME }}.xcarchive
+  BUILD_IPA_PATH: ${{ env.BUILD_OUTPUT_DIRECTORY }}/${{ env.BUILD_NAME }}.ipa
+  BUILD_EXPORT_OPTIONS_PATH: ${{ env.BUILD_CODESIGN_DIRECTORY }}/
+  DEPLOY_APPCENTER_DISTRIBUTION_GROUPS: Collaborators
+  DEPLOY_APPCENTER_APP_NAME: nholloh-ams/Github-Action-Demo-Feature-Bugfix
       
 jobs:
   #swiftlint:
@@ -71,6 +81,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v1
       
+      # Install signing assets
+      - name: Clean existing provisioning profiles
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: remove_all_provisioning_profiles
+
+      - name: Install provisioning profiles
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: install_provisioning_profile
+          provisioning-profile-path: .codesign/*.mobileprovision
+
+      - name: Unlock keychain
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: unlock_keychain
+          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
       # Build and archive
       - name: xcodebuild Archive
         uses: sersoft-gmbh/xcodebuild-action@v2.1
@@ -79,4 +108,46 @@ jobs:
           scheme: GithubActionDemo
           sdk: iphoneos
           output-formatter: xcbeautify
-          action: clean archive
+          action: clean archive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }}
+
+      # Export ipa
+      - name: Export IPA
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          output-formatter: xcbeautify
+          action: exportArchive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }}
+
+      # Upload artifact
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: ${{ env.BUILD_NAME }}
+          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}/*
+
+      # Lock keychain
+      - name: Lock keychain
+        uses: AuroraForge/apple-signing-assets-action@main
+        if: always()
+        with:
+          action: lock_keychain
+          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
+      
+  deploy-to-appcenter:
+    name: Deploy To AppCenter
+    needs: build-archive
+    runs-on: self-hosted
+    steps:
+      - name: Download artficats
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ env.BUILD_NAME }}
+          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}
+      - name: Deploy To AppCenter
+        uses: wzieba/AppCenter-Github-Action@v1.3.4
+        with:
+          appName: ${{ env.DEPLOY_APPCENTER_APP_NAME }}
+          token: ${{ secrets.APP_CENTER_TOKEN }}
+          group: ${{ env.DEPLOY_APPCENTER_DISTRIBUTION_GROUPS }}
+          file: ${{ env.BUILD_IPA_PATH }}
+    
