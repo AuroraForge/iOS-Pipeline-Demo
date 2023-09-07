@@ -24,6 +24,7 @@ env:
       
 jobs:
   swiftlint:
+    name: Swiftlint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
