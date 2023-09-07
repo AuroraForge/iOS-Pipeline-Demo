@@ -11,6 +11,8 @@ env:
   DEMO_BUNDLE_ID: 'de.adesso-mobile.research.ghademo.branch'
   DEMO_BACKEND_ENVIRONMENT: 'dev'
   DEMO_APP_ICON: 'AppIcon'
+  DEMO_PROVISIONING_PROFILE_NAME: GithubActionDemoWildcardAdHoc
+  DEMO_PROVISIONING_PROFILE_SPECIFIER: 84339b9f-8da0-4fc5-af71-f585d565a907
   BUILD_OUTPUT_DIRECTORY: .build
   BUILD_KEYCHAIN_PATH: .codesign/certificates.keychain
   BUILD_VARIANT: Branch
