@@ -1,4 +1,4 @@
-name: feature-bugfix
+name: "Feature/Bugfix"
 on: 
   workflow_dispatch:
   pull_request:
@@ -115,7 +115,7 @@ jobs:
           scheme: GithubActionDemo
           sdk: iphoneos
           output-formatter: xcbeautify
-          action: clean archive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -showBuildSettings
+          action:  -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -showBuildSettings clean archive
 
       # Export ipa
       - name: Export IPA
@@ -123,7 +123,7 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           output-formatter: xcbeautify
-          action: exportArchive -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }}
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_IPA_PATH }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} exportArchive
 
       # Upload artifact
       - name: Upload artifacts
