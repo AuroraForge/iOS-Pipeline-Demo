@@ -41,7 +41,7 @@ env:
       
 jobs:
   build-archive:
-    name: Archive (${{ github.run_id }})
+    name: Archive ${{ inputs.version }} (${{ github.run_id }})
     runs-on: self-hosted
     steps:
       # Get the sources
