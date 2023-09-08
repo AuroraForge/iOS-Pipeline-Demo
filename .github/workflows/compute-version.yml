@@ -6,7 +6,9 @@ on:
         required: true
         type: boolean
     outputs:
-      computed-version: ${{ jobs.compute-version.outputs.computed-version }}
+      computed-version: 
+        description: The version computed by this action.
+        value: ${{ jobs.compute-version.outputs.computed-version }}
 
 env:
   BUILD_OUTPUT_DIRECTORY: .build
