@@ -15,7 +15,7 @@ on:
         required: true
         type: string
       shield-color:
-        required: true
+        required: false
         type: string
       build-variant:
         required: true
@@ -67,6 +67,7 @@ jobs:
 
       # Shield App Icon
       - name: Shield App Icon
+        if: inputs.shield-color != ''
         run: bundle install && bundle exec fastlane add_shield
 
       # Print environment
