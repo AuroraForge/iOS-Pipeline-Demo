@@ -19,7 +19,7 @@ platform :ios do
   desc "Add shield to app icon"
   lane :add_shield do
     add_badge(
-      shield: "#{ENV['DEMO_VERSION']}-#{ENV['BUILD_VARIANT']}-blue",
+      shield: "#{ENV['DEMO_VERSION']}-#{ENV['BUILD_VARIANT']}-#{ENV['DEMO_SHIELD_COLOR']}",
       shield_gravity: 'South',
       no_badge: true
     )

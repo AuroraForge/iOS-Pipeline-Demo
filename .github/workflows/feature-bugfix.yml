@@ -12,6 +12,7 @@ env:
   DEMO_BACKEND_ENVIRONMENT: 'dev'
   DEMO_APP_ICON: 'AppIcon'
   DEMO_PROVISIONING_PROFILE_NAME: GithubActionDemoWildcardAdHoc
+  DEMO_SHIELD_COLOR: blue
   BUILD_OUTPUT_DIRECTORY: .build
   BUILD_KEYCHAIN_PATH: .codesign/certificates.keychain
   BUILD_VARIANT: Branch
