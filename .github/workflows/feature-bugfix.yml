@@ -11,16 +11,16 @@ env:
 jobs:
   swiftlint:
     name: Swiftlint
-    uses: ./.github/workflows/reusable/swiftlint.yml
+    uses: ./.github/workflows/swiftlint.yml
   
   test-unit:
     name: Unit Test
-    uses: ./.github/workflows/reusable/test-unit.yml
+    uses: ./.github/workflows/test-unit.yml
 
   build-archive:
     name: Archive (${{ github.run_id }})
     needs: test-unit
-    uses: ./.github/workflows/reusable/build-archive.yml
+    uses: ./.github/workflows/build-archive.yml
     with:
       version: '1.0.0'
       bundle-id: de.adesso-mobile.research.ghademo.branch
@@ -33,7 +33,7 @@ jobs:
   deploy-to-appcenter:
     name: Deploy To AppCenter
     needs: build-archive
-    uses: ./.github/workflows/reusable/deploy-to-appcenter.yml
+    uses: ./.github/workflows/deploy-to-appcenter.yml
     with:
       build-variant: Branch
       distribution-groups: Collaborators
