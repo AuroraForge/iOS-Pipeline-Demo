@@ -19,6 +19,7 @@ jobs:
     name: Archive (${{ github.run_id }})
     needs: test-unit
     uses: ./.github/workflows/build-archive.yml
+    secrets: inherit
     with:
       version: '1.0.0'
       bundle-id: de.adesso-mobile.research.ghademo
@@ -30,3 +31,4 @@ jobs:
   deploy-to-testflight:
     name: Deploy to Testflight
     uses: ./.github/workflows/deploy-to-testflight.yml
+    secrets: inherit

@@ -15,6 +15,7 @@ jobs:
     name: Archive (${{ github.run_id }})
     needs: test-unit
     uses: ./.github/workflows/build-archive.yml
+    secrets: inherit
     with:
       version: '1.0.0'
       bundle-id: de.adesso-mobile.research.ghademo.snapshot
@@ -28,6 +29,7 @@ jobs:
     name: Deploy To AppCenter
     needs: build-archive
     uses: ./.github/workflows/deploy-to-appcenter.yml
+    secrets: inherit
     with:
       build-variant: Snapshot
       distribution-groups: Collaborators
