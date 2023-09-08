@@ -19,7 +19,7 @@ jobs:
       read-only: true
 
   build-archive:
-    name: Archive ${{ inputs.version }} (${{ github.run_id }})
+    name: Archive ${{ needs.compute-version.outputs.computed-version }} (${{ github.run_id }})
     needs: [test-unit, compute-version]
     uses: ./.github/workflows/build-archive.yml
     secrets: inherit
