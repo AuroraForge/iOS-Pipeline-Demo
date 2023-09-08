@@ -31,6 +31,7 @@ env:
   DEMO_BACKEND_ENVIRONMENT: ${{ inputs.backend }}
   DEMO_APP_ICON: 'AppIcon'
   DEMO_SHIELD_COLOR: ${{ inputs.shield-color }}
+  DEMO_PROVISIONING_PROFILE_NAME: ${{ inputs.provisioning-profile }}
   BUILD_OUTPUT_DIRECTORY: .build
   BUILD_KEYCHAIN_PATH: .codesign/certificates.keychain
   BUILD_VARIANT: ${{ inputs.build-variant }}
