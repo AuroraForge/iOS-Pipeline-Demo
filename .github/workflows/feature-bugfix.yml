@@ -101,6 +101,10 @@ jobs:
           keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
           keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
 
+      # Shield App Icon
+      - name: Shield App Icon
+        run: fastlane run badge shield:"${{ env.DEMO_VERSION }}-${{ env.BUILD_VARIANT }}-blue" no_badge:true shield_gravity:"South"
+
       # Print environment
       - name: Print Environment
         run: printenv
