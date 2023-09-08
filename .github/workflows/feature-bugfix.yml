@@ -103,7 +103,7 @@ jobs:
 
       # Shield App Icon
       - name: Shield App Icon
-        run: fastlane run badge shield:"${{ env.DEMO_VERSION }}-${{ env.BUILD_VARIANT }}-blue" no_badge:true shield_gravity:"South"
+        run: bundle install && bundle exec fastlane add_shield
 
       # Print environment
       - name: Print Environment
