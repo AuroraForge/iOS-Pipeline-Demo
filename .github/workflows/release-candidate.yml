@@ -6,12 +6,19 @@ on:
       - main
       
 jobs:
+  lint-pr:
+    name: Lint Pull Request
+    permissions: write-all
+    uses: ./.github/workflows/lint-pull-request.yml
+
   swiftlint:
     name: Swiftlint
+    needs: lint-pr
     uses: ./.github/workflows/swiftlint.yml
   
   test-unit:
     name: Unit Test
+    needs: lint-pr
     permissions: write-all
     uses: ./.github/workflows/test-unit.yml
 
