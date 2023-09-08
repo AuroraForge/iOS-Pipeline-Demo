@@ -118,7 +118,7 @@ jobs:
           scheme: GithubActionDemo
           destination: generic/platform=iOS
           sdk: iphoneos
-          output-formatter: cat
+          output-formatter: xcbeautify
           action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -verbose clean archive
 
       # Export ipa
@@ -127,7 +127,7 @@ jobs:
         with:
           project: GithubActionDemo.xcodeproj
           output-formatter: xcbeautify
-          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_OUTPUT_DIRECTORY }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_OUTPUT_DIRECTORY }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive -verbose
 
       # Upload artifact
       - name: Upload artifacts
