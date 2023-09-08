@@ -15,13 +15,20 @@ jobs:
     permissions: write-all
     uses: ./.github/workflows/test-unit.yml
 
+  compute-version:
+    name: Compute Version
+    permissions: write-all
+    uses: ./.github/workflows/compute-version.yml
+    with:
+      read-only: false
+
   build-archive:
     name: Archive (${{ github.run_id }})
-    needs: test-unit
+    needs: [test-unit, compute-version]
     uses: ./.github/workflows/build-archive.yml
     secrets: inherit
     with:
-      version: '1.0.0'
+      version: ${{ needs.compute-version.outputs.computed-version }}
       bundle-id: de.adesso-mobile.research.ghademo
       backend: prod
       provisioning-profile: GithubActionDemoAppStore
