@@ -1,20 +1,24 @@
-name: "Feature/Bugfix"
+name: "Release Candidate"
 on: 
   workflow_dispatch:
   pull_request:
     branches:
-      - develop
-
-env:
-  BUILD_VARIANT: Branch
+      - main
       
 jobs:
+  lint-pr:
+    name: Lint Pull Request
+    permissions: write-all
+    uses: ./.github/workflows/lint-pull-request.yml
+
   swiftlint:
     name: Swiftlint
+    needs: lint-pr
     uses: ./.github/workflows/swiftlint.yml
   
   test-unit:
     name: Unit Test
+    needs: lint-pr
     permissions: write-all
     uses: ./.github/workflows/test-unit.yml
 
@@ -32,11 +36,11 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.compute-version.outputs.computed-version }}
-      bundle-id: de.adesso-mobile.research.ghademo.branch
-      backend: dev
+      bundle-id: de.adesso-mobile.research.ghademo.release-candidate
+      backend: staging
       provisioning-profile: GithubActionDemoWildcardAdHoc
-      shield-color: blue
-      build-variant: Branch
+      shield-color: green
+      build-variant: ReleaseCandidate
       export-options: ExportOptionsWildcardAdHoc
         
   deploy-to-appcenter:
@@ -45,6 +49,6 @@ jobs:
     uses: ./.github/workflows/deploy-to-appcenter.yml
     secrets: inherit
     with:
-      build-variant: Branch
+      build-variant: ReleaseCandidate
       distribution-groups: Collaborators
-      appcenter-app-name: nholloh-ams/Github-Action-Demo-Feature-Bugfix
+      appcenter-app-name: nholloh-ams/Github-Action-Demo-Release-Candidate

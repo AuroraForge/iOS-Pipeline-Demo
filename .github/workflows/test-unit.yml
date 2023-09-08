@@ -1,0 +1,49 @@
+name: "Unit Test"
+on: 
+  workflow_call:
+      
+env:
+  DEMO_VERSION: '0.1.0'
+  DEMO_BUILD_NUMBER: ${{ github.run_id }}
+  DEMO_BUNDLE_ID: 'de.adesso-mobile.research.ghademo.unittest'
+  DEMO_BACKEND_ENVIRONMENT: 'dev'
+  DEMO_APP_ICON: 'AppIcon'
+      
+jobs:  
+  test-unit:
+    name: Unit Test
+    runs-on: self-hosted
+    permissions: write-all
+    steps:
+      # Get the sources
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      # Run the unit tests
+      - name: xcodebuild Test
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          project: GithubActionDemo.xcodeproj
+          scheme: GithubActionDemo
+          derived-data-path: .derived_data
+          destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
+          output-formatter: xcbeautify
+          enable-code-coverage: true
+          action: clean test
+
+      # Convert the xctestresult bundle to a junit report
+      - shell: bash
+        name: Convert test results
+        if: success() || failure()
+        run: |
+          mkdir .test_results
+          xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > .test_results/report.junit
+
+      # Publish the junit report
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Unit Test Report            
+          path: .test_results/report.junit
+          reporter: java-junit 

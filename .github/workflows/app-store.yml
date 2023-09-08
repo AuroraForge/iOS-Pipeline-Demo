@@ -1,12 +1,9 @@
-name: "Feature/Bugfix"
-on: 
+name: "App Store"
+on:
   workflow_dispatch:
-  pull_request:
+  push:
     branches:
-      - develop
-
-env:
-  BUILD_VARIANT: Branch
+      - main
       
 jobs:
   swiftlint:
@@ -23,7 +20,7 @@ jobs:
     permissions: write-all
     uses: ./.github/workflows/compute-version.yml
     with:
-      read-only: true
+      read-only: false
 
   build-archive:
     name: Archive ${{ needs.compute-version.outputs.computed-version }} (${{ github.run_id }})
@@ -32,19 +29,13 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.compute-version.outputs.computed-version }}
-      bundle-id: de.adesso-mobile.research.ghademo.branch
-      backend: dev
-      provisioning-profile: GithubActionDemoWildcardAdHoc
-      shield-color: blue
-      build-variant: Branch
-      export-options: ExportOptionsWildcardAdHoc
-        
-  deploy-to-appcenter:
-    name: Deploy To AppCenter
-    needs: build-archive
-    uses: ./.github/workflows/deploy-to-appcenter.yml
+      bundle-id: de.adesso-mobile.research.ghademo
+      backend: prod
+      provisioning-profile: GithubActionDemoAppStore
+      build-variant: AppStore
+      export-options: ExportOptionsAppStore
+  
+  deploy-to-testflight:
+    name: Deploy to Testflight
+    uses: ./.github/workflows/deploy-to-testflight.yml
     secrets: inherit
-    with:
-      build-variant: Branch
-      distribution-groups: Collaborators
-      appcenter-app-name: nholloh-ams/Github-Action-Demo-Feature-Bugfix

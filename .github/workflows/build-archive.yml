@@ -1,0 +1,114 @@
+name: "Build & Archive"
+on: 
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      bundle-id:
+        required: true
+        type: string
+      backend:
+        required: true
+        type: string
+      provisioning-profile:
+        required: true
+        type: string
+      shield-color:
+        required: false
+        type: string
+      build-variant:
+        required: true
+        type: string
+      export-options:
+        required: true
+        type: string
+
+env:
+  DEMO_VERSION: ${{ inputs.version }}
+  DEMO_BUILD_NUMBER: ${{ github.run_id }}
+  DEMO_BUNDLE_ID: ${{ inputs.bundle-id }}
+  DEMO_BACKEND_ENVIRONMENT: ${{ inputs.backend }}
+  DEMO_APP_ICON: 'AppIcon'
+  DEMO_SHIELD_COLOR: ${{ inputs.shield-color }}
+  DEMO_PROVISIONING_PROFILE_NAME: ${{ inputs.provisioning-profile }}
+  BUILD_OUTPUT_DIRECTORY: .build
+  BUILD_KEYCHAIN_PATH: .codesign/certificates.keychain
+  BUILD_VARIANT: ${{ inputs.build-variant }}
+  BUILD_NAME: GithubActionDemo${{ inputs.build-variant }}
+  BUILD_XCARCHIVE_PATH: .build/GithubActionDemo${{ inputs.build-variant }}.xcarchive
+  BUILD_EXPORT_OPTIONS_PATH: .codesign/${{ inputs.export-options }}.plist
+      
+jobs:
+  build-archive:
+    name: Archive ${{ inputs.version }} (${{ github.run_id }})
+    runs-on: self-hosted
+    steps:
+      # Get the sources
+      - name: Checkout
+        uses: actions/checkout@v1
+      
+      # Install signing assets
+      - name: Clean existing provisioning profiles
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: remove_all_provisioning_profiles
+
+      - name: Install provisioning profiles
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: install_provisioning_profile
+          provisioning-profile-path: .codesign/*.mobileprovision
+
+      - name: Unlock keychain
+        uses: AuroraForge/apple-signing-assets-action@main
+        with:
+          action: unlock_keychain
+          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
+          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+
+      # Shield App Icon
+      - name: Shield App Icon
+        if: inputs.shield-color != ''
+        run: bundle install && bundle exec fastlane add_shield
+
+      # Print environment
+      - name: Print Environment
+        run: printenv
+        shell: bash
+
+      # Build and archive
+      - name: xcodebuild Archive
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          project: GithubActionDemo.xcodeproj
+          scheme: GithubActionDemo
+          destination: generic/platform=iOS
+          sdk: iphoneos
+          output-formatter: xcbeautify
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -verbose clean archive
+
+      # Export ipa
+      - name: Export IPA
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          project: GithubActionDemo.xcodeproj
+          output-formatter: xcbeautify
+          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_OUTPUT_DIRECTORY }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive -verbose
+
+      # Upload artifact
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: ${{ env.BUILD_NAME }}
+          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}/*
+
+      # Lock keychain
+      - name: Lock keychain
+        uses: AuroraForge/apple-signing-assets-action@main
+        if: always()
+        with:
+          action: lock_keychain
+          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
+    
