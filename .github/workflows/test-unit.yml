@@ -1,7 +1,6 @@
 name: "Unit Test"
 on: 
   workflow_call:
-    inputs:
       
 env:
   DEMO_VERSION: '0.1.0'
