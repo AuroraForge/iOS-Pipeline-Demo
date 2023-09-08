@@ -1,0 +1,36 @@
+name: "Deploy To AppCenter"
+on: 
+  workflow_call:
+    inputs:
+      build-variant:
+        required: true
+        type: string
+      distribution-groups:
+        required: true
+        type: string
+      appcenter-app-name:
+        required: true
+        type: string
+
+env:
+  BUILD_OUTPUT_DIRECTORY: .build
+      
+jobs:      
+  deploy-to-appcenter:
+    name: Deploy To AppCenter
+    needs: build-archive
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artficats
+        uses: actions/download-artifact@v3
+        with:
+          name: GithubActionDemo${{ inputs.build-variant }}
+          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}
+      - name: Deploy To AppCenter
+        uses: wzieba/AppCenter-Github-Action@v1.3.4
+        with:
+          appName: ${{ inputs.appcenter-app-name }}
+          token: ${{ secrets.APP_CENTER_TOKEN }}
+          group: ${{ inputs.distribution-groups }}
+          file: ${{ env.BUILD_OUTPUT_DIRECTORY }}/GithubActionDemo.ipa
+    

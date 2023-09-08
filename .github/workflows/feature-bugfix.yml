@@ -2,165 +2,39 @@ name: "Feature/Bugfix"
 on: 
   workflow_dispatch:
   pull_request:
-    branches:    
+    branches:
       - develop
 
 env:
-  DEMO_VERSION: '1.0.0'
-  DEMO_BUILD_NUMBER: ${{ github.run_id }}
-  DEMO_BUNDLE_ID: 'de.adesso-mobile.research.ghademo.branch'
-  DEMO_BACKEND_ENVIRONMENT: 'dev'
-  DEMO_APP_ICON: 'AppIcon'
-  DEMO_PROVISIONING_PROFILE_NAME: GithubActionDemoWildcardAdHoc
-  DEMO_SHIELD_COLOR: blue
-  BUILD_OUTPUT_DIRECTORY: .build
-  BUILD_KEYCHAIN_PATH: .codesign/certificates.keychain
   BUILD_VARIANT: Branch
-  BUILD_NAME: GithubActionDemoBranch
-  BUILD_XCARCHIVE_PATH: .build/GithubActionDemoBranch.xcarchive
-  BUILD_IPA_PATH: .build/GithubActionDemoBranch.ipa
-  BUILD_EXPORT_OPTIONS_PATH: .codesign/ExportOptionsWildcardAdHoc.plist
-  DEPLOY_APPCENTER_DISTRIBUTION_GROUPS: Collaborators
-  DEPLOY_APPCENTER_APP_NAME: nholloh-ams/Github-Action-Demo-Feature-Bugfix
       
 jobs:
   swiftlint:
     name: Swiftlint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: SwiftLint (Only files changed in the PR)
-        uses: norio-nomura/action-swiftlint@3.2.1
-        env:
-          DIFF_BASE: ${{ github.base_ref }}
+    uses: ./.github/workflows/reusable/swiftlint.yml
   
   test-unit:
     name: Unit Test
-    needs: swiftlint
-    runs-on: self-hosted
-    permissions: write-all
-    steps:
-      # Get the sources
-      - name: Checkout
-        uses: actions/checkout@v1
-
-      # Run the unit tests
-      - name: xcodebuild Test
-        uses: sersoft-gmbh/xcodebuild-action@v2.1
-        with:
-          project: GithubActionDemo.xcodeproj
-          scheme: GithubActionDemo
-          derived-data-path: .derived_data
-          destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
-          output-formatter: xcbeautify
-          enable-code-coverage: true
-          action: clean test
-
-      # Convert the xctestresult bundle to a junit report
-      - shell: bash
-        name: Convert test results
-        if: success() || failure()
-        run: |
-          mkdir test_results
-          xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > test_results/report.junit
-
-      # Publish the junit report
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
-        if: success() || failure()
-        with:
-          name: Unit Test Report            
-          path: test_results/report.junit
-          reporter: java-junit 
+    uses: ./.github/workflows/reusable/test-unit.yml
 
   build-archive:
     name: Archive (${{ github.run_id }})
     needs: test-unit
-    runs-on: self-hosted
-    steps:
-      # Get the sources
-      - name: Checkout
-        uses: actions/checkout@v1
-      
-      # Install signing assets
-      - name: Clean existing provisioning profiles
-        uses: AuroraForge/apple-signing-assets-action@main
-        with:
-          action: remove_all_provisioning_profiles
-
-      - name: Install provisioning profiles
-        uses: AuroraForge/apple-signing-assets-action@main
-        with:
-          action: install_provisioning_profile
-          provisioning-profile-path: .codesign/*.mobileprovision
-
-      - name: Unlock keychain
-        uses: AuroraForge/apple-signing-assets-action@main
-        with:
-          action: unlock_keychain
-          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
-          keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
-
-      # Shield App Icon
-      - name: Shield App Icon
-        run: bundle install && bundle exec fastlane add_shield
-
-      # Print environment
-      - name: Print Environment
-        run: printenv
-        shell: bash
-
-      # Build and archive
-      - name: xcodebuild Archive
-        uses: sersoft-gmbh/xcodebuild-action@v2.1
-        with:
-          project: GithubActionDemo.xcodeproj
-          scheme: GithubActionDemo
-          destination: generic/platform=iOS
-          sdk: iphoneos
-          output-formatter: xcbeautify
-          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -verbose clean archive
-
-      # Export ipa
-      - name: Export IPA
-        uses: sersoft-gmbh/xcodebuild-action@v2.1
-        with:
-          project: GithubActionDemo.xcodeproj
-          output-formatter: xcbeautify
-          action: -archivePath ${{ env.BUILD_XCARCHIVE_PATH }} -exportPath ${{ env.BUILD_OUTPUT_DIRECTORY }} -exportOptionsPlist ${{ env.BUILD_EXPORT_OPTIONS_PATH }} -exportArchive -verbose
-
-      # Upload artifact
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        if: success() || failure()
-        with:
-          name: ${{ env.BUILD_NAME }}
-          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}/*
-
-      # Lock keychain
-      - name: Lock keychain
-        uses: AuroraForge/apple-signing-assets-action@main
-        if: always()
-        with:
-          action: lock_keychain
-          keychain-path: ${{ env.BUILD_KEYCHAIN_PATH }}
-      
+    uses: ./.github/workflows/reusable/build-archive.yml
+    with:
+      version: '1.0.0'
+      bundle-id: de.adesso-mobile.research.ghademo.branch
+      backend: dev
+      provisioning-profile: GithubActionDemoWildcardAdHoc
+      shield-color: blue
+      build-variant: Branch
+      export-options: ExportOptionsWildcardAdHoc
+        
   deploy-to-appcenter:
     name: Deploy To AppCenter
     needs: build-archive
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download artficats
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.BUILD_NAME }}
-          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}
-      - name: Deploy To AppCenter
-        uses: wzieba/AppCenter-Github-Action@v1.3.4
-        with:
-          appName: ${{ env.DEPLOY_APPCENTER_APP_NAME }}
-          token: ${{ secrets.APP_CENTER_TOKEN }}
-          group: ${{ env.DEPLOY_APPCENTER_DISTRIBUTION_GROUPS }}
-          file: ${{ env.BUILD_OUTPUT_DIRECTORY }}/GithubActionDemo.ipa
-    
+    uses: ./.github/workflows/reusable/deploy-to-appcenter.yml
+    with:
+      build-variant: Branch
+      distribution-groups: Collaborators
+      appcenter-app-name: nholloh-ams/Github-Action-Demo-Feature-Bugfix
