@@ -1,0 +1,34 @@
+name: "Snapshot"
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - 'develop'
+      
+jobs:  
+  test-unit:
+    name: Unit Test
+    permissions: write-all
+    uses: ./.github/workflows/test-unit.yml
+
+  build-archive:
+    name: Archive (${{ github.run_id }})
+    needs: test-unit
+    uses: ./.github/workflows/build-archive.yml
+    with:
+      version: '1.0.0'
+      bundle-id: de.adesso-mobile.research.ghademo.snapshot
+      backend: dev
+      provisioning-profile: GithubActionDemoWildcardAdHoc
+      shield-color: 8A2BE2
+      build-variant: Snapshot
+      export-options: ExportOptionsWildcardAdHoc
+        
+  deploy-to-appcenter:
+    name: Deploy To AppCenter
+    needs: build-archive
+    uses: ./.github/workflows/deploy-to-appcenter.yml
+    with:
+      build-variant: Snapshot
+      distribution-groups: Collaborators
+      appcenter-app-name: nholloh-ams/Github-Action-Demo-Snapshot

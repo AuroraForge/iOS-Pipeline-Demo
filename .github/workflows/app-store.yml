@@ -1,0 +1,32 @@
+name: "App Store"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      
+jobs:
+  swiftlint:
+    name: Swiftlint
+    uses: ./.github/workflows/swiftlint.yml
+  
+  test-unit:
+    name: Unit Test
+    permissions: write-all
+    uses: ./.github/workflows/test-unit.yml
+
+  build-archive:
+    name: Archive (${{ github.run_id }})
+    needs: test-unit
+    uses: ./.github/workflows/build-archive.yml
+    with:
+      version: '1.0.0'
+      bundle-id: de.adesso-mobile.research.ghademo
+      backend: prod
+      provisioning-profile: GithubActionDemoAppStore
+      build-variant: AppStore
+      export-options: ExportOptionsAppStore
+  
+  deploy-to-testflight:
+    name: Deploy to Testflight
+    uses: ./.github/workflows/deploy-to-testflight.yml
