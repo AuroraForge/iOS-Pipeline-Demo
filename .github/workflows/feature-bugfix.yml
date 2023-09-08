@@ -23,59 +23,59 @@ env:
   DEPLOY_APPCENTER_APP_NAME: nholloh-ams/Github-Action-Demo-Feature-Bugfix
       
 jobs:
-  #swiftlint:
-  #  name: Swiftlint
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #    - name: Checkout
-  #      uses: actions/checkout@v1
-  #    - name: SwiftLint (Only files changed in the PR)
-  #      uses: norio-nomura/action-swiftlint@3.2.1
-  #      env:
-  #        DIFF_BASE: ${{ github.base_ref }}
+  swiftlint:
+    name: Swiftlint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: SwiftLint (Only files changed in the PR)
+        uses: norio-nomura/action-swiftlint@3.2.1
+        env:
+          DIFF_BASE: ${{ github.base_ref }}
   
-  #test-unit:
-  #  name: Unit Test
-  #  needs: swiftlint
-  #  runs-on: self-hosted
-  #  permissions: write-all
-  #  steps:
-  #    # Get the sources
-  #    - name: Checkout
-  #      uses: actions/checkout@v1
+  test-unit:
+    name: Unit Test
+    needs: swiftlint
+    runs-on: self-hosted
+    permissions: write-all
+    steps:
+      # Get the sources
+      - name: Checkout
+        uses: actions/checkout@v1
 
       # Run the unit tests
-  #    - name: xcodebuild Test
-  #      uses: sersoft-gmbh/xcodebuild-action@v2.1
-  #      with:
-  #        project: GithubActionDemo.xcodeproj
-  #        scheme: GithubActionDemo
-  #        derived-data-path: .derived_data
-  #        destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
-  #        output-formatter: xcbeautify
-  #        enable-code-coverage: true
-  #        action: clean test
+      - name: xcodebuild Test
+        uses: sersoft-gmbh/xcodebuild-action@v2.1
+        with:
+          project: GithubActionDemo.xcodeproj
+          scheme: GithubActionDemo
+          derived-data-path: .derived_data
+          destination: platform=iOS Simulator,OS=16.4,name=iPhone 14 Pro
+          output-formatter: xcbeautify
+          enable-code-coverage: true
+          action: clean test
 
       # Convert the xctestresult bundle to a junit report
-  #    - shell: bash
-  #      name: Convert test results
-  #      if: success() || failure()
-  #      run: |
-  #        mkdir test_results
-  #        xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > test_results/report.junit
+      - shell: bash
+        name: Convert test results
+        if: success() || failure()
+        run: |
+          mkdir test_results
+          xcresultparser -o junit --coverage .derived_data/Logs/Test/*.xcresult > test_results/report.junit
 
       # Publish the junit report
-  #    - name: Publish Test Results
-  #      uses: dorny/test-reporter@v1
-  #      if: success() || failure()
-  #      with:
-  #        name: Unit Test Report            
-  #        path: test_results/report.junit
-  #        reporter: java-junit 
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Unit Test Report            
+          path: test_results/report.junit
+          reporter: java-junit 
 
   build-archive:
     name: Archive (${{ github.run_id }})
-    #needs: test-unit
+    needs: test-unit
     runs-on: self-hosted
     steps:
       # Get the sources
