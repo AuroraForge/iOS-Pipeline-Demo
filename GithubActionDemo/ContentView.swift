@@ -31,13 +31,18 @@ struct ContentView: View {
         Bundle.main.infoDictionary?["CFBundleIdentifier"] as? String
     }
     
+    init() {
+        pickedEnvironment = environment ?? "dev"
+    }
+    
     var body: some View {
         VStack(spacing: 8) {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundColor(.accentColor)
             Text("Hello, world!")
-            Text("Environment: " + (environment ?? "nil"))
+            Text("Injected Environment: " + (environment ?? "nil"))
+            Text("Current Environment: " + pickedEnvironment)
             Text("Version: " + (version ?? "nil"))
             Text("Bundle ID:\n" + (bundleId ?? "nil"))
             
