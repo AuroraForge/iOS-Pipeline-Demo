@@ -1,0 +1,28 @@
+name: "Lint Pull Request"
+on: 
+  workflow_call:
+      
+jobs:
+  lint-pr:
+    name: Lint Pull Request
+    runs-on: ubuntu-latest
+    if: ${{ !(contains(github.event.pull_request.title, '(MAJOR)') && contains(github.event.pull_request.title, '(MINOR)') && contains(github.event.pull_request.title, '(PATCH)')) }}
+    steps:
+      - name: Add (MAJOR) to title
+        if: contains(github.event.pull_request.labels.*.name, 'MAJOR')
+        uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ github.token }}
+          title-template: '(MAJOR) '
+      - name: Add (MINOR) to title
+        if: contains(github.event.pull_request.labels.*.name, 'minor')
+        uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ github.token }}
+          title-template: '(MINOR) '
+      - name: Add (PATCH) to title
+        if: contains(github.event.pull_request.labels.*.name, 'patch')
+        uses: tzkhan/pr-update-action@v2
+        with:
+          repo-token: ${{ github.token }}
+          title-template: '(PATCH) '

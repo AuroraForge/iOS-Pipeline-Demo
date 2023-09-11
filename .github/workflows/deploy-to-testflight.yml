@@ -1,0 +1,25 @@
+name: "Deploy To Testflight"
+on: 
+  workflow_call:
+
+env:
+  BUILD_OUTPUT_DIRECTORY: .build
+      
+jobs:      
+  deploy-to-testflight:
+    name: Deploy To Testflight
+    runs-on: self-hosted
+    steps:
+      - name: Download artficats
+        uses: actions/download-artifact@v3
+        with:
+          name: GithubActionDemoAppStore
+          path: ${{ env.BUILD_OUTPUT_DIRECTORY }}
+      - name: Deploy To Testflight
+        uses: apple-actions/upload-testflight-build@v1
+        with: 
+            app-path: ${{ env.BUILD_OUTPUT_DIRECTORY }}/GithubActionDemo.ipa
+            issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
+            api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
+            api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+    

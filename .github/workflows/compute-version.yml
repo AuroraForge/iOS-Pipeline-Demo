@@ -1,0 +1,39 @@
+name: "Compute Version"
+on: 
+  workflow_call:
+    inputs:
+      read-only:
+        required: true
+        type: boolean
+    outputs:
+      computed-version: 
+        description: The version computed by this action.
+        value: ${{ jobs.compute-version.outputs.computed-version }}
+
+env:
+  BUILD_OUTPUT_DIRECTORY: .build
+      
+jobs:      
+  compute-version:
+    name: Compute Version
+    runs-on: ubuntu-latest
+    outputs:
+      computed-version: ${{ steps.version.outputs.version }}
+    steps:
+      # Get the sources
+      - name: Checkout
+        uses: actions/checkout@v1
+      # Compute version
+      - name: Compute version
+        id: version
+        uses: paulhatch/semantic-version@v5.1.0
+        with:
+          # The prefix to use to identify tags
+          tag_prefix: "v"
+          # A string to determine the format of the version output
+          version_format: "${major}.${minor}.${patch}"
+      - name: Tag commit
+        if: inputs.read-only == false
+        run: |
+          git tag ${{ steps.version.outputs.version_tag }}
+          git push origin ${{ steps.version.outputs.version_tag }}
