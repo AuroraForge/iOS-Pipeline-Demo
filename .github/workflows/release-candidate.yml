@@ -40,7 +40,7 @@ jobs:
       backend: staging
       provisioning-profile: GithubActionDemoWildcardAdHoc
       shield-color: green
-      build-variant: ReleaseCandidate
+      build-variant: RC
       export-options: ExportOptionsWildcardAdHoc
         
   deploy-to-appcenter:
@@ -49,6 +49,6 @@ jobs:
     uses: ./.github/workflows/deploy-to-appcenter.yml
     secrets: inherit
     with:
-      build-variant: ReleaseCandidate
+      build-variant: RC
       distribution-groups: Collaborators
       appcenter-app-name: nholloh-ams/Github-Action-Demo-Release-Candidate

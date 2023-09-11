@@ -35,7 +35,7 @@ jobs:
       bundle-id: de.adesso-mobile.research.ghademo.branch
       backend: dev
       provisioning-profile: GithubActionDemoWildcardAdHoc
-      shield-color: blue
+      shield-color: crimson
       build-variant: Branch
       export-options: ExportOptionsWildcardAdHoc
         
