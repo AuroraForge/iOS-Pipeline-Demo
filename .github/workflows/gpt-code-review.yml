@@ -9,7 +9,7 @@ jobs:
         permissions: write-all
         steps:
           - name: gpt-review
-            uses: microsoft/gpt-review@v0.9.5
+            uses: microsoft/gpt-review@main
             with:
               GITHUB_TOKEN: ${{ github.token }}
               OPENAI_ORG_KEY: 'org-ReuxU2hMoVFAGXSBEtdMOQ2y'
