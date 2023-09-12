@@ -1,6 +1,9 @@
 name: "📷 Snapshot"
 on: 
   workflow_dispatch:
+    inputs:
+      version:
+        type: string
   push:
     branches:
       - 'develop'
