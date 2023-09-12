@@ -1,0 +1,16 @@
+name: GPT Code Review
+on: 
+  workflow_call:
+
+jobs:
+    gpt-code-review:
+        name: 'GPT Code Review'
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
+          - name: gpt-review
+            uses: microsoft/gpt-review@v0.9.4
+            with:
+              GITHUB_TOKEN: ${{ github.token }}
+              OPENAI_ORG_KEY: 'org-ReuxU2hMoVFAGXSBEtdMOQ2y'
+              OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

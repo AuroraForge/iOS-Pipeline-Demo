@@ -1,28 +1,15 @@
-name: "Feature/Bugfix"
+name: "Snapshot"
 on: 
   workflow_dispatch:
-  pull_request:
+  push:
     branches:
-      - develop
-
-env:
-  BUILD_VARIANT: Branch
+      - 'develop'
       
-jobs:
-  swiftlint:
-    name: Swiftlint
-    uses: ./.github/workflows/swiftlint.yml
-  
+jobs:  
   test-unit:
     name: Unit Test
     permissions: write-all
     uses: ./.github/workflows/test-unit.yml
-
-  gpt-code-review:
-    name: GPT Code Review
-    needs: [swiftlint, test-unit]
-    permissions: write-all
-    uses: ./.github/workflows/gpt-code-review.yml
 
   compute-version:
     name: Compute Version
@@ -38,11 +25,11 @@ jobs:
     secrets: inherit
     with:
       version: ${{ needs.compute-version.outputs.computed-version }}
-      bundle-id: de.adesso-mobile.research.ghademo.branch
+      bundle-id: de.adesso-mobile.research.ghademo.snapshot
       backend: dev
       provisioning-profile: GithubActionDemoWildcardAdHoc
-      shield-color: crimson
-      build-variant: Branch
+      shield-color: 8A2BE2
+      build-variant: Snapshot
       export-options: ExportOptionsWildcardAdHoc
         
   deploy-to-appcenter:
@@ -51,6 +38,6 @@ jobs:
     uses: ./.github/workflows/deploy-to-appcenter.yml
     secrets: inherit
     with:
-      build-variant: Branch
+      build-variant: Snapshot
       distribution-groups: Collaborators
-      appcenter-app-name: nholloh-ams/Github-Action-Demo-Feature-Bugfix
+      appcenter-app-name: nholloh-ams/Github-Action-Demo-Snapshot

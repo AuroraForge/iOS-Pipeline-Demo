@@ -1,0 +1,41 @@
+name: "App Store"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      
+jobs:
+  swiftlint:
+    name: Swiftlint
+    uses: ./.github/workflows/swiftlint.yml
+  
+  test-unit:
+    name: Unit Test
+    permissions: write-all
+    uses: ./.github/workflows/test-unit.yml
+
+  compute-version:
+    name: Compute Version
+    permissions: write-all
+    uses: ./.github/workflows/compute-version.yml
+    with:
+      read-only: false
+
+  build-archive:
+    name: Archive ${{ needs.compute-version.outputs.computed-version }} (${{ github.run_id }})
+    needs: [test-unit, compute-version]
+    uses: ./.github/workflows/build-archive.yml
+    secrets: inherit
+    with:
+      version: ${{ needs.compute-version.outputs.computed-version }}
+      bundle-id: de.adesso-mobile.research.ghademo
+      backend: prod
+      provisioning-profile: GithubActionDemoAppStore
+      build-variant: AppStore
+      export-options: ExportOptionsAppStore
+  
+  deploy-to-testflight:
+    name: Deploy to Testflight
+    uses: ./.github/workflows/deploy-to-testflight.yml
+    secrets: inherit
