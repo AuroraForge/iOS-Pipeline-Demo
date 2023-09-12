@@ -1,4 +1,4 @@
-name: "Feature/Bugfix"
+name: "✨ Feature / 🐞 Bugfix"
 on: 
   workflow_dispatch:
   pull_request:
@@ -17,6 +17,12 @@ jobs:
     name: Unit Test
     permissions: write-all
     uses: ./.github/workflows/test-unit.yml
+
+  gpt-code-review:
+    name: GPT Code Review
+    needs: [swiftlint, test-unit]
+    permissions: write-all
+    uses: ./.github/workflows/gpt-code-review.yml
 
   compute-version:
     name: Compute Version

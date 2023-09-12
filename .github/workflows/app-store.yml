@@ -1,4 +1,4 @@
-name: "App Store"
+name: "🍏 App Store"
 on:
   workflow_dispatch:
   push:
